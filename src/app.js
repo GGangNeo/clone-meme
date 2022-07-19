@@ -1,36 +1,70 @@
-const canvas = document.querySelector("canvas");
-const ctx = canvas.getContext("2d");
-
-console.dir(ctx);
-
-const XOFFSET_HOME = -50;
-const YOFFSET_HOME = -25;
-
+const color = document.getElementById('color');
+const lineWidth = document.getElementById('line-width');
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 800;
-ctx.fillRect(200 + XOFFSET_HOME, 200 + YOFFSET_HOME, 50, 200);
-ctx.fillRect(400 + XOFFSET_HOME, 200 + YOFFSET_HOME, 50, 200);
-ctx.fillRect(300 + XOFFSET_HOME, 300 + YOFFSET_HOME, 50, 100);
-ctx.fillRect(200 + XOFFSET_HOME, 200 + YOFFSET_HOME, 200, 20);
-ctx.moveTo(200 + XOFFSET_HOME, 200 + YOFFSET_HOME);
-ctx.lineTo(325 + XOFFSET_HOME, 100 + YOFFSET_HOME);
-ctx.lineTo(450 + XOFFSET_HOME, 200 + YOFFSET_HOME);
-ctx.fill();
+ctx.lineWidth = 2;
+let isPainting = false;
+/**
+ * https://flatuicolors.com/palette/defo
+ */
+const colors = [
+  '#ff3838',
+  '#ffb8b8',
+  '#c56cf0',
+  '#ff9f1a',
+  '#fff200',
+  '#32ff7e',
+  '#7efff5',
+  '#18dcff',
+  '#7d5fff',
+];
 
+function onClick(event) {
+  console.dir(event);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  ctx.strokeStyle = color;
+  ctx.lineTo(event.offsetX, event.offsetY);
+  ctx.stroke();
+}
 
-const xOffset = 320;
-const yOffset = 320;
+function onMove(event) {
+  if (isPainting) {
+    ctx.lineTo(event.offsetX, event.offsetY);
+    // ctx.fill();
+    ctx.stroke();
+    return;
+  }
+  ctx.moveTo(event.offsetX, event.offsetY);
+  console.log(`${event.offsetX}, ${event.offsetY}`);
+}
+function startPainting() {
+  isPainting = true;
+}
+function cancelPainting() {
+  isPainting = false;
+  ctx.beginPath();
+}
 
-ctx.beginPath();
-ctx.fillRect(170 + xOffset, 170 + yOffset, 15, 100);
-ctx.fillRect(310 + xOffset, 170 + yOffset, 15, 100);
-ctx.fillRect(220 + xOffset, 170 + yOffset, 60, 200);
+function onLineWidthChange(event) {
+  ctx.lineWidth = event.target.value;
+}
 
-ctx.arc(250 + xOffset, 100 + yOffset, 50, 0, 2 * Math.PI);
-ctx.fill();
+function onColorChange(event) {
+  ctx.strokeStyle = event.target.value;
+  ctx.fillStyle = event.target.value;
+}
 
-ctx.beginPath();
-ctx.fillStyle = "white";
-ctx.arc(270 + xOffset, 80 + yOffset, 8, Math.PI, 2 * Math.PI);
-ctx.arc(230 + xOffset, 80 + yOffset, 8, Math.PI, 2 * Math.PI);
-ctx.fill();
+canvas.addEventListener('mousemove', onMove);
+canvas.addEventListener('mousedown', startPainting);
+canvas.addEventListener('mouseup', cancelPainting);
+canvas.addEventListener('mouseleave', cancelPainting);
+
+lineWidth.addEventListener('change', onLineWidthChange);
+color.addEventListener('change', onColorChange);
+// 2.0 Painting lines
+// canvas.addEventListener('mousemove', onClick);
+// canvas.addEventListener('click', onClick);
